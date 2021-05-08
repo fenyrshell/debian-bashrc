@@ -1,0 +1,88 @@
+# 1.- Recover ~/.bashrc from /etc/skel/.bashrc (Optional)
+# cp /etc/skel/.bashrc ~/.bashrc
+# 
+#
+# 2.- Copy this file to ~/
+# 
+# cp bashrc_fenyrshell ~/.bashrc_fenyrshell
+#
+#
+# 3.- Copy at the end of ~/.bashrc file
+# 
+# # Fenyrshell bashrc configuration
+# if [ -f ~/.bashrc_fenyrshell ]; then
+#    . ~/.bashrc_fenyrshell
+# fi
+
+# Git branch info
+function git-branch() {
+    git branch 2> /dev/null | sed -e "/^[^*]/d" -e "s/* \(.*\)/(\1)/" 
+}
+
+# Random string
+function str-random() {
+    < /dev/urandom tr -dc 'a-zA-Z0-9_-' | head -c${1:-16}; echo;
+}
+
+# Bash colors
+STYLE="01" # [ 00 => Normal, 01 => Bold ]
+BLACK="\[\033[$STYLE;30m\]"
+RED="\[\033[$STYLE;31m\]"
+GREEN="\[\033[$STYLE;32m\]"
+YELLOW="\[\033[$STYLE;33m\]"
+BLUE="\[\033[$STYLE;34m\]"
+MAGENTA="\[\033[$STYLE;35m\]"
+CYAN="\[\033[$STYLE;36m\]"
+LIGHT_GRAY="\[\033[$STYLE;37m\]"
+GRAY="\[\033[$STYLE;90m\]"
+LIGHT_RED="\[\033[$STYLE;91m\]"
+LIGHT_GREEN="\[\033[$STYLE;92m\]"
+LIGHT_YELLOW="\[\033[$STYLE;93m\]"
+LIGHT_BLUE="\[\033[$STYLE;94m\]"
+LIGHT_MAGENTA="\[\033[$STYLE;95m\]"
+LIGHT_CYAN="\[\033[$STYLE;96m\]"
+WHITE="\[\033[$STYLE;97m\]"
+ENDCOLOR="\[\033[00m\]"
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+    else
+	color_prompt=
+    fi
+fi
+
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}'$LIGHT_GRAY'\342\224\214\342\224\200['$YELLOW'\u'$LIGHT_GRAY'@'$LIGHT_CYAN'\h'$LIGHT_GRAY']'$LIGHT_GRAY'\342\224\200'$LIGHT_GRAY'['$GREEN'\w'$LIGHT_GRAY']'$RED' $(git-branch) '$LIGHT_GRAY'\n\342\224\224\342\224\200\342\224\200[ '$ENDCOLOR
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# some more ls aliases
+alias ll='ls -l'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Alias
+alias update-system='sudo apt update && sudo apt upgrade'
